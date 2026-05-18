@@ -58,14 +58,21 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   
   const handleStartCapture = useCallback(() => {
     setCapturing(true);
+    setRecordedChunks([]);
     setPreviewUrl(null);
     setTimeRemaining(timeLimit);
     
     if (webcamRef.current && webcamRef.current.stream) {
-      const options: MediaRecorderOptions = { mimeType: 'video/webm' };
-      // Cap bitrate to keep files small and uploads reliable
+      const options: MediaRecorderOptions = {};
+      if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
+        options.mimeType = 'video/webm;codecs=vp8,opus';
+      } else if (MediaRecorder.isTypeSupported('video/webm')) {
+        options.mimeType = 'video/webm';
+      }
+      // Keep bitrate moderate for smoother local playback
       try {
-        options.videoBitsPerSecond = 500_000; // 500 kbps
+        options.videoBitsPerSecond = 1_500_000; // 1.5 Mbps
+        options.audioBitsPerSecond = 128_000; // 128 kbps
       } catch {}
       mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, options);
       
@@ -74,7 +81,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
         handleDataAvailable
       );
       
-      mediaRecorderRef.current.start(1000);
+      mediaRecorderRef.current.start(250);
     }
   }, [webcamRef, mediaRecorderRef, timeLimit]);
   
@@ -95,10 +102,13 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   }, [mediaRecorderRef, setCapturing]);
   
   const handleReset = useCallback(() => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setRecordedChunks([]);
     setPreviewUrl(null);
     setTimeRemaining(timeLimit);
-  }, [timeLimit]);
+  }, [timeLimit, previewUrl]);
   
   useEffect(() => {
     if (recordedChunks.length > 0 && !capturing) {
@@ -109,6 +119,14 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       setPreviewUrl(url);
     }
   }, [recordedChunks, capturing]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
   
   const handleAccept = useCallback(() => {
     if (recordedChunks.length > 0) {
@@ -117,10 +135,13 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       });
       onVideoRecorded(blob);
       // Reset after accepting
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setRecordedChunks([]);
       setPreviewUrl(null);
     }
-  }, [recordedChunks, onVideoRecorded]);
+  }, [recordedChunks, onVideoRecorded, previewUrl]);
   
   // Format time as MM:SS
   const formatTime = (seconds: number): string => {

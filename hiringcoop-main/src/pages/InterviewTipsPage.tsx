@@ -27,7 +27,34 @@ const InterviewTipsPage = () => {
 
         {/* Main Content */}
         <div className="container-custom px-4 py-12">
-          <Tabs defaultValue="video" className="max-w-4xl mx-auto">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <aside className="lg:col-span-3">
+              <div className="lg:sticky lg:top-24 space-y-4">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">Interview Guide</CardTitle>
+                    <CardDescription>Jump to any topic quickly</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <a href="#video-setup" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Video Setup</a>
+                    <a href="#preparation" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Preparation</a>
+                    <a href="#presentation" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Presentation</a>
+                    <a href="#common-questions" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Common Questions</a>
+                    <a href="#follow-up" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Follow-up</a>
+                  </CardContent>
+                </Card>
+              </div>
+            </aside>
+
+            <div className="lg:col-span-9">
+              <Tabs defaultValue="video" className="max-w-4xl">
+            <div className="mb-4 flex flex-wrap gap-2 lg:hidden">
+              <a href="#video-setup" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Video Setup</a>
+              <a href="#preparation" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Preparation</a>
+              <a href="#presentation" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Presentation</a>
+              <a href="#common-questions" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Common Questions</a>
+              <a href="#follow-up" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Follow-up</a>
+            </div>
             <TabsList className="grid w-full grid-cols-1 md:grid-cols-5">
               <TabsTrigger value="video">Video Setup</TabsTrigger>
               <TabsTrigger value="preparation">Preparation</TabsTrigger>
@@ -37,7 +64,7 @@ const InterviewTipsPage = () => {
             </TabsList>
             
             {/* Video Setup Tips */}
-            <TabsContent value="video" className="mt-6">
+            <TabsContent value="video" className="mt-6" id="video-setup">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -103,7 +130,7 @@ const InterviewTipsPage = () => {
             </TabsContent>
 
             {/* Preparation Tips */}
-            <TabsContent value="preparation" className="mt-6">
+            <TabsContent value="preparation" className="mt-6" id="preparation">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -160,7 +187,7 @@ const InterviewTipsPage = () => {
             </TabsContent>
 
             {/* Presentation Tips */}
-            <TabsContent value="presentation" className="mt-6">
+            <TabsContent value="presentation" className="mt-6" id="presentation">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -217,7 +244,7 @@ const InterviewTipsPage = () => {
             </TabsContent>
 
             {/* Common Questions Tips */}
-            <TabsContent value="questions" className="mt-6">
+            <TabsContent value="questions" className="mt-6" id="common-questions">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -294,7 +321,7 @@ const InterviewTipsPage = () => {
             </TabsContent>
 
             {/* Follow-up Tips */}
-            <TabsContent value="followup" className="mt-6">
+            <TabsContent value="followup" className="mt-6" id="follow-up">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -371,7 +398,9 @@ const InterviewTipsPage = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-          </Tabs>
+              </Tabs>
+            </div>
+          </div>
 
           {/* Practice Section */}
           <div className="max-w-4xl mx-auto mt-12">

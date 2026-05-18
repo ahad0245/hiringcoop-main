@@ -107,7 +107,7 @@ const ApplyPage = () => {
     // Simulate API call for submission
     setTimeout(() => {
       setSubmitting(false);
-      navigate('/apply-success');
+      navigate('/candidate/applications');
     }, 2000);
   };
   

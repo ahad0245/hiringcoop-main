@@ -1,17 +1,15 @@
 
-import { Navbar } from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FiVideo, FiMic, FiMonitor, FiUser, FiMessageCircle } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
 
 const InterviewTipsPage = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-grow bg-muted/30">
+    <DashboardLayout userType="candidate">
+      <div className="bg-muted/30 min-h-full">
         {/* Hero Section */}
         <div className="bg-primary text-white py-16">
           <div className="container-custom px-4">
@@ -27,34 +25,7 @@ const InterviewTipsPage = () => {
 
         {/* Main Content */}
         <div className="container-custom px-4 py-12">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <aside className="lg:col-span-3">
-              <div className="lg:sticky lg:top-24 space-y-4">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">Interview Guide</CardTitle>
-                    <CardDescription>Jump to any topic quickly</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <a href="#video-setup" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Video Setup</a>
-                    <a href="#preparation" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Preparation</a>
-                    <a href="#presentation" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Presentation</a>
-                    <a href="#common-questions" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Common Questions</a>
-                    <a href="#follow-up" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Follow-up</a>
-                  </CardContent>
-                </Card>
-              </div>
-            </aside>
-
-            <div className="lg:col-span-9">
-              <Tabs defaultValue="video" className="max-w-4xl">
-            <div className="mb-4 flex flex-wrap gap-2 lg:hidden">
-              <a href="#video-setup" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Video Setup</a>
-              <a href="#preparation" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Preparation</a>
-              <a href="#presentation" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Presentation</a>
-              <a href="#common-questions" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Common Questions</a>
-              <a href="#follow-up" className="text-xs rounded-full border px-3 py-1.5 hover:bg-muted">Follow-up</a>
-            </div>
+          <Tabs defaultValue="video" className="max-w-4xl mx-auto">
             <TabsList className="grid w-full grid-cols-1 md:grid-cols-5">
               <TabsTrigger value="video">Video Setup</TabsTrigger>
               <TabsTrigger value="preparation">Preparation</TabsTrigger>
@@ -64,7 +35,7 @@ const InterviewTipsPage = () => {
             </TabsList>
             
             {/* Video Setup Tips */}
-            <TabsContent value="video" className="mt-6" id="video-setup">
+            <TabsContent value="video" className="mt-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -130,7 +101,7 @@ const InterviewTipsPage = () => {
             </TabsContent>
 
             {/* Preparation Tips */}
-            <TabsContent value="preparation" className="mt-6" id="preparation">
+            <TabsContent value="preparation" className="mt-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -187,7 +158,7 @@ const InterviewTipsPage = () => {
             </TabsContent>
 
             {/* Presentation Tips */}
-            <TabsContent value="presentation" className="mt-6" id="presentation">
+            <TabsContent value="presentation" className="mt-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -244,7 +215,7 @@ const InterviewTipsPage = () => {
             </TabsContent>
 
             {/* Common Questions Tips */}
-            <TabsContent value="questions" className="mt-6" id="common-questions">
+            <TabsContent value="questions" className="mt-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -321,7 +292,7 @@ const InterviewTipsPage = () => {
             </TabsContent>
 
             {/* Follow-up Tips */}
-            <TabsContent value="followup" className="mt-6" id="follow-up">
+            <TabsContent value="followup" className="mt-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -398,9 +369,7 @@ const InterviewTipsPage = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-              </Tabs>
-            </div>
-          </div>
+          </Tabs>
 
           {/* Practice Section */}
           <div className="max-w-4xl mx-auto mt-12">
@@ -416,9 +385,8 @@ const InterviewTipsPage = () => {
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

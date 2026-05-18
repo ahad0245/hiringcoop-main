@@ -74,13 +74,13 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
         options.videoBitsPerSecond = 1_500_000; // 1.5 Mbps
         options.audioBitsPerSecond = 128_000; // 128 kbps
       } catch {}
-      mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, options);
-      
-      mediaRecorderRef.current.addEventListener(
-        'dataavailable',
-        handleDataAvailable
-      );
-      
+      const recorder = new MediaRecorder(webcamRef.current.stream, options);
+      recorder.ondataavailable = handleDataAvailable;
+      recorder.onstop = () => {
+        recorder.ondataavailable = null;
+        recorder.onstop = null;
+      };
+      mediaRecorderRef.current = recorder;
       mediaRecorderRef.current.start(250);
     }
   }, [webcamRef, mediaRecorderRef, timeLimit]);
@@ -95,8 +95,12 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   );
   
   const handleStopCapture = useCallback(() => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (error) {
+        console.error("Error stopping recording:", error);
+      }
     }
     setCapturing(false);
   }, [mediaRecorderRef, setCapturing]);

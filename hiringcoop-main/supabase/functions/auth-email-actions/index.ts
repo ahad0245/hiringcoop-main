@@ -34,11 +34,28 @@ function jsonResponse(body: Record<string, any>, status = 200) {
   });
 }
 
+function normalizeUrl(url: string): string {
+  return url.replace(/\/+$/, "");
+}
+
 function getBaseUrl(origin?: string): string {
-  if (origin && (origin.startsWith("https://") || origin.startsWith("http://localhost"))) {
-    return origin;
+  const siteUrl =
+    Deno.env.get("PUBLIC_SITE_URL") ||
+    Deno.env.get("SITE_URL") ||
+    "https://www.nikfix.com";
+
+  if (origin) {
+    const safeOrigin = normalizeUrl(origin);
+    if (
+      safeOrigin.startsWith("https://www.nikfix.com") ||
+      safeOrigin.startsWith("https://nikfix.com") ||
+      safeOrigin.startsWith("http://localhost")
+    ) {
+      return safeOrigin;
+    }
   }
-  return "https://hiringcoop.lovable.app";
+
+  return normalizeUrl(siteUrl);
 }
 
 const handler = async (req: Request): Promise<Response> => {

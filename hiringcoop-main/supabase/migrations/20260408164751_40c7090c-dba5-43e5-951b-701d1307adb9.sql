@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN featured_recording_group_id uuid DEFAULT NULL;

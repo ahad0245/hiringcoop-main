@@ -19,6 +19,7 @@ interface Application {
   created_at: string;
   candidate_name: string;
   candidate_email: string;
+  candidate_linkedin: string;
 }
 
 const STATUSES = ['new', 'reviewed', 'shortlisted', 'interview', 'hired', 'rejected'];
@@ -55,16 +56,32 @@ const CandidatePipelinePage = () => {
     const appsList = apps || [];
     const candidateIds = appsList.map((a: any) => a.candidate_id);
 
-    let profilesMap: Record<string, { name: string; email: string }> = {};
+    let profilesMap: Record<string, { name: string; email: string; linkedin: string }> = {};
     if (candidateIds.length > 0) {
-      const { data: profiles } = await sb
+      let profiles: any[] = [];
+      let profilesError: any = null;
+
+      const withContactEmail = await sb
         .from('profiles')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, email, contact_email, linkedin_url')
         .in('id', candidateIds);
+
+      profiles = withContactEmail.data || [];
+      profilesError = withContactEmail.error;
+
+      if (profilesError && String(profilesError.message || '').includes('contact_email')) {
+        const fallback = await sb
+          .from('profiles')
+          .select('id, first_name, last_name, email, linkedin_url')
+          .in('id', candidateIds);
+        profiles = fallback.data || [];
+      }
+
       (profiles || []).forEach((p: any) => {
         profilesMap[p.id] = {
           name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Unknown',
-          email: '',
+          email: p.contact_email || p.email || '',
+          linkedin: p.linkedin_url || '',
         };
       });
     }
@@ -75,8 +92,9 @@ const CandidatePipelinePage = () => {
       status: a.status,
       cover_letter: a.cover_letter,
       created_at: a.created_at,
-      candidate_name: profilesMap[a.candidate_id]?.name || 'Unknown',
-      candidate_email: profilesMap[a.candidate_id]?.email || '',
+      candidate_email: profilesMap[a.candidate_id]?.email || a.candidate_email || '',
+      candidate_linkedin: profilesMap[a.candidate_id]?.linkedin || '',
+      candidate_name: profilesMap[a.candidate_id]?.name || a.candidate_name || 'Unknown',
     }));
 
     setApplications(enriched);
@@ -161,6 +179,14 @@ const CandidatePipelinePage = () => {
                         <p className="text-sm text-muted-foreground">
                           Applied {new Date(app.created_at).toLocaleDateString()}
                         </p>
+                        {app.candidate_email && (
+                          <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                            <FiMail className="h-3.5 w-3.5" />
+                            <a href={`mailto:${app.candidate_email}`} className="text-primary hover:underline">
+                              {app.candidate_email}
+                            </a>
+                          </p>
+                        )}
                         {app.cover_letter && (
                           <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{app.cover_letter}</p>
                         )}

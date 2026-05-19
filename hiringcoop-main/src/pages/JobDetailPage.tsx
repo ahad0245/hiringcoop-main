@@ -113,11 +113,37 @@ const JobDetailPage = ({ embedded = false }: { embedded?: boolean }) => {
     }
     setSubmitting(true);
     const supabaseAny = supabase as any;
+    let candidateName: string | null = null;
+    let candidateEmail: string | null = user.email || null;
+
+    const withContact = await supabaseAny
+      .from('profiles')
+      .select('first_name, last_name, contact_email, email')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    let profileData = withContact.data;
+    if (withContact.error && String(withContact.error.message || '').includes('contact_email')) {
+      const fallbackProfile = await supabaseAny
+        .from('profiles')
+        .select('first_name, last_name, email')
+        .eq('id', user.id)
+        .maybeSingle();
+      profileData = fallbackProfile.data;
+    }
+
+    if (profileData) {
+      candidateName = `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim() || null;
+      candidateEmail = profileData.contact_email || profileData.email || candidateEmail;
+    }
+
     const { error } = await supabaseAny.from('applications').insert({
       job_id: jobId,
       candidate_id: user.id,
       cover_letter: coverLetter || null,
       resume_url: selectedVideo || null, // storing video ref in resume_url for now
+      candidate_name: candidateName,
+      candidate_email: candidateEmail,
     });
 
     if (error) {

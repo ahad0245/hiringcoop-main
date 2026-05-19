@@ -88,7 +88,7 @@ const EmployerDashboard = () => {
           status: a.status,
           created_at: a.created_at,
           job_title: job?.title || 'Unknown',
-          candidate_name: profilesMap[a.candidate_id] || 'Unknown',
+          candidate_name: profilesMap[a.candidate_id] || a.candidate_name || 'Unknown',
         };
       });
 

@@ -71,7 +71,7 @@ const CandidateListPage = () => {
         return {
           id: app.id,
           candidateId: app.candidate_id,
-          name: [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Unknown',
+          name: [p.first_name, p.last_name].filter(Boolean).join(' ') || app.candidate_name || 'Unknown',
           title: p.headline || p.title || '',
           location: p.location || '',
           skills: p.skills || [],

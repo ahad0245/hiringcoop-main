@@ -127,6 +127,7 @@ const CandidateProfilePage = () => {
       setFormData({
         first_name: profile?.first_name || '',
         last_name: profile?.last_name || '',
+        contact_email: (profile as any)?.contact_email || (profile as any)?.email || '',
         title: profile?.title || '',
         bio: profile?.bio || '',
         headline: (profile as any)?.headline || '',
@@ -150,8 +151,29 @@ const CandidateProfilePage = () => {
       await updateProfile(formData);
       setIsEditing(false);
       toast({ title: "Profile updated", description: "Your profile has been updated successfully" });
-    } catch (err: any) {
-      setUpdateError(err.message || 'An error occurred while updating your profile');
+0    } catch (err: any) {
+      const message = err?.message || '';
+      const missingContactEmailColumn =
+        message.includes("contact_email") && message.includes("schema cache");
+
+      if (missingContactEmailColumn) {
+        // Backward compatibility: if DB column is not migrated yet, retry without contact_email
+        const { contact_email, ...safeUpdates } = formData as any;
+        try {
+          await updateProfile(safeUpdates);
+          setIsEditing(false);
+          toast({
+            title: "Profile updated",
+            description: "Saved without contact email. Run DB migration to enable this field.",
+          });
+          return;
+        } catch (retryErr: any) {
+          setUpdateError(retryErr.message || 'An error occurred while updating your profile');
+          return;
+        }
+      }
+
+      setUpdateError(message || 'An error occurred while updating your profile');
     } finally {
       setUpdating(false);
     }
@@ -345,6 +367,17 @@ const CandidateProfilePage = () => {
                   <div><Label htmlFor="first_name">First Name</Label><Input id="first_name" name="first_name" value={formData.first_name || ''} onChange={handleInputChange} /></div>
                   <div><Label htmlFor="last_name">Last Name</Label><Input id="last_name" name="last_name" value={formData.last_name || ''} onChange={handleInputChange} /></div>
                 </div>
+                <div>
+                  <Label htmlFor="contact_email">Contact Email</Label>
+                  <Input
+                    id="contact_email"
+                    name="contact_email"
+                    type="email"
+                    value={(formData as any).contact_email || ''}
+                    onChange={handleInputChange}
+                    placeholder="you@example.com"
+                  />
+                </div>
                 <div><Label htmlFor="title">Professional Title</Label><Input id="title" name="title" value={formData.title || ''} onChange={handleInputChange} placeholder="e.g., Frontend Developer" /></div>
                 <div><Label htmlFor="headline">Headline</Label><Input id="headline" name="headline" value={(formData as any).headline || ''} onChange={handleInputChange} placeholder="e.g., Passionate about building great products" /></div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -365,6 +398,14 @@ const CandidateProfilePage = () => {
                 {(profile as any)?.linkedin_url && (
                   <a href={(profile as any).linkedin_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-3 text-primary hover:underline text-sm">
                     <FiLinkedin className="h-4 w-4" /> LinkedIn Profile
+                  </a>
+                )}
+                {((profile as any)?.contact_email || (profile as any)?.email) && (
+                  <a
+                    href={`mailto:${(profile as any).contact_email || (profile as any).email}`}
+                    className="inline-flex items-center gap-1 mt-3 ml-3 text-primary hover:underline text-sm"
+                  >
+                    <FiLink className="h-4 w-4" /> {(profile as any).contact_email || (profile as any).email}
                   </a>
                 )}
               </div>

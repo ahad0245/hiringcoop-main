@@ -7,6 +7,8 @@ export interface ProfileType {
   id: string;
   first_name: string | null;
   last_name: string | null;
+  email: string | null;
+  contact_email: string | null;
   avatar_url: string | null;
   resume_url: string | null;
   bio: string | null;

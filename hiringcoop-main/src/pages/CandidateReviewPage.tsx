@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FiArrowLeft, FiDownload, FiMail, FiPhone, FiUser, FiMapPin, FiCalendar, FiBookmark, FiThumbsUp, FiThumbsDown, FiCheck } from "react-icons/fi";
+import { FiArrowLeft, FiDownload, FiMail, FiUser, FiMapPin, FiCalendar, FiBookmark, FiThumbsUp, FiThumbsDown, FiCheck, FiLinkedin } from "react-icons/fi";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
@@ -18,6 +18,8 @@ import InterviewPlayer from '@/components/video/InterviewPlayer';
 interface CandidateProfile {
   first_name: string | null;
   last_name: string | null;
+  email: string | null;
+  contact_email: string | null;
   title: string | null;
   location: string | null;
   bio: string | null;
@@ -32,6 +34,8 @@ interface ApplicationData {
   status: string;
   cover_letter: string | null;
   resume_url: string | null;
+  candidate_name: string | null;
+  candidate_email: string | null;
   created_at: string;
   employer_notes: string | null;
   job_id: string;
@@ -107,6 +111,8 @@ const CandidateReviewPage = () => {
         status: app.status,
         cover_letter: app.cover_letter,
         resume_url: app.resume_url,
+        candidate_name: app.candidate_name || null,
+        candidate_email: app.candidate_email || null,
         created_at: app.created_at,
         employer_notes: app.employer_notes,
         job_id: app.job_id,
@@ -215,8 +221,11 @@ const CandidateReviewPage = () => {
     toast({ title: 'Notes saved' });
   };
 
-  const firstName = profile?.first_name || 'Unknown';
-  const lastName = profile?.last_name || '';
+  const fullNameFromApplication = application?.candidate_name?.trim() || '';
+  const firstName = profile?.first_name || fullNameFromApplication.split(' ')[0] || 'Unknown';
+  const lastName = profile?.last_name || fullNameFromApplication.split(' ').slice(1).join(' ') || '';
+  const candidateEmail = profile?.contact_email?.trim() || profile?.email?.trim() || application?.candidate_email?.trim() || null;
+  const candidateLinkedin = profile?.linkedin_url?.trim() || null;
 
   if (loading) {
     return (
@@ -279,6 +288,27 @@ const CandidateReviewPage = () => {
                 </div>
 
                 <div className="space-y-3">
+                  {candidateEmail && (
+                    <div className="flex items-center">
+                      <FiMail className="mr-3 text-muted-foreground" />
+                      <a href={`mailto:${candidateEmail}`} className="text-sm text-primary hover:underline break-all">
+                        {candidateEmail}
+                      </a>
+                    </div>
+                  )}
+                  {candidateLinkedin && (
+                    <div className="flex items-center">
+                      <FiLinkedin className="mr-3 text-muted-foreground" />
+                      <a
+                        href={candidateLinkedin.startsWith('http') ? candidateLinkedin : `https://${candidateLinkedin}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline break-all"
+                      >
+                        LinkedIn Profile
+                      </a>
+                    </div>
+                  )}
                   {profile?.location && (
                     <div className="flex items-center">
                       <FiMapPin className="mr-3 text-muted-foreground" />
@@ -322,7 +352,17 @@ const CandidateReviewPage = () => {
                         <FiDownload className="mr-2" /> Download Resume
                       </Button>
                     )}
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        if (!candidateEmail) {
+                          toast({ variant: 'destructive', title: 'Candidate email not available' });
+                          return;
+                        }
+                        window.location.href = `mailto:${candidateEmail}`;
+                      }}
+                    >
                       <FiMail className="mr-2" /> Contact Candidate
                     </Button>
                     <Button variant="outline" className="w-full justify-start">

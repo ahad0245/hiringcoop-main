@@ -18,6 +18,8 @@ import { useToast } from "@/hooks/use-toast";
 
 const JobPostingPage = () => {
   const navigate = useNavigate();
+  const tabOrder = ["details", "description", "questions"] as const;
+  const [currentTab, setCurrentTab] = useState<(typeof tabOrder)[number]>("details");
   
   // Form state
   const [formData, setFormData] = useState({
@@ -148,9 +150,22 @@ const JobPostingPage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
+  const currentTabIndex = tabOrder.indexOf(currentTab);
+  const isLastTab = currentTabIndex === tabOrder.length - 1;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const goToNextTab = () => {
+    if (currentTabIndex < tabOrder.length - 1) {
+      setCurrentTab(tabOrder[currentTabIndex + 1]);
+    }
+  };
+
+  const goToPreviousTab = () => {
+    if (currentTabIndex > 0) {
+      setCurrentTab(tabOrder[currentTabIndex - 1]);
+    }
+  };
+
+  const handleSubmit = async () => {
     if (!user) return;
     setSaving(true);
     try {
@@ -197,8 +212,8 @@ const JobPostingPage = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <Tabs defaultValue="details" className="w-full">
+        <form onSubmit={(e) => e.preventDefault()}>
+          <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as (typeof tabOrder)[number])} className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="details">Job Details</TabsTrigger>
               <TabsTrigger value="description">Description & Requirements</TabsTrigger>
@@ -220,7 +235,6 @@ const JobPostingPage = () => {
                         value={formData.title}
                         onChange={handleChange}
                         placeholder="e.g. Frontend Developer"
-                        required
                       />
                     </div>
 
@@ -243,7 +257,6 @@ const JobPostingPage = () => {
                         value={formData.location}
                         onChange={handleChange}
                         placeholder="e.g. New York, NY"
-                        required
                       />
                     </div>
 
@@ -382,7 +395,6 @@ const JobPostingPage = () => {
                       value={formData.description}
                       onChange={handleChange}
                       placeholder="Provide a detailed description of the position..."
-                      required
                       className="resize-none"
                     />
                   </div>
@@ -396,7 +408,6 @@ const JobPostingPage = () => {
                       value={formData.responsibilities}
                       onChange={handleChange}
                       placeholder="List the key responsibilities of the role..."
-                      required
                       className="resize-none"
                     />
                   </div>
@@ -410,7 +421,6 @@ const JobPostingPage = () => {
                       value={formData.requirements}
                       onChange={handleChange}
                       placeholder="List education, experience, and other requirements..."
-                      required
                       className="resize-none"
                     />
                   </div>
@@ -525,6 +535,11 @@ const JobPostingPage = () => {
               </Label>
             </div>
             <div className="flex space-x-2">
+              {currentTabIndex > 0 && (
+                <Button type="button" variant="outline" onClick={goToPreviousTab}>
+                  Previous
+                </Button>
+              )}
               <Button 
                 type="button" 
                 variant="outline" 
@@ -532,9 +547,15 @@ const JobPostingPage = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={saving}>
-                <FiSave className="mr-2" /> {saving ? 'Saving...' : 'Save Job Posting'}
-              </Button>
+              {isLastTab ? (
+                <Button type="button" disabled={saving} onClick={handleSubmit}>
+                  <FiSave className="mr-2" /> {saving ? 'Publishing...' : 'Publish Job'}
+                </Button>
+              ) : (
+                <Button type="button" onClick={goToNextTab}>
+                  Next
+                </Button>
+              )}
             </div>
           </div>
         </form>

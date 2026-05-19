@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { FiUser, FiVideo, FiUserCheck, FiCheck } from 'react-icons/fi';
 
 interface ApplyStepsProps {
@@ -18,24 +17,24 @@ const ApplySteps = ({ currentStep }: ApplyStepsProps) => {
     <nav aria-label="Progress">
       <ol className="flex items-center w-full">
         {steps.map((step, stepIdx) => (
-          <li 
-            key={step.name} 
+          <li
+            key={step.name}
             className={`flex-1 ${stepIdx !== steps.length - 1 ? 'relative' : ''}`}
           >
             <div className="flex flex-col items-center">
               {/* Step line */}
               {stepIdx !== steps.length - 1 && (
-                <div 
-                  className={`absolute top-4 w-full h-0.5 ${
+                <div
+                  className={`absolute top-4 left-1/2 w-full h-0.5 -translate-y-1/2 ${
                     stepIdx < currentStep ? 'bg-primary' : 'bg-gray-200'
-                  }`} 
+                  }`}
                   aria-hidden="true"
                 />
               )}
 
               {/* Step indicator */}
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center bg-white ${
                   stepIdx < currentStep
                     ? 'bg-primary text-white' // Completed
                     : stepIdx === currentStep

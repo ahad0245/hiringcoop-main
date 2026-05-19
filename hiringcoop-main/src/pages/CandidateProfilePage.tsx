@@ -151,7 +151,7 @@ const CandidateProfilePage = () => {
       await updateProfile(formData);
       setIsEditing(false);
       toast({ title: "Profile updated", description: "Your profile has been updated successfully" });
-0    } catch (err: any) {
+    } catch (err: any) {
       const message = err?.message || '';
       const missingContactEmailColumn =
         message.includes("contact_email") && message.includes("schema cache");
@@ -299,66 +299,68 @@ const CandidateProfilePage = () => {
         )}
         
         {/* Header Card */}
-        <Card className="mb-6">
-          <div className="h-40 bg-gradient-to-r from-primary/80 to-accent/60 rounded-t-lg relative"></div>
+        <Card className="mb-6 rounded-3xl overflow-hidden border bg-card">
+          <div className="h-28 bg-gradient-to-r from-[#c9b9ff] to-[#b6a6ff] relative">
+            <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_80%_20%,white,transparent_40%),radial-gradient(circle_at_65%_35%,white,transparent_30%)]" />
+            <div className="absolute left-6 top-4 text-white/60">
+              <FiUser className="h-8 w-8" />
+            </div>
+          </div>
           <CardContent className="relative pt-0">
-            <div className="-mt-16 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
-              <div className="flex items-end">
-                <div className="relative group">
-                  <Avatar className="h-32 w-32 border-4 border-background">
-                    <AvatarImage src={profile?.avatar_url || undefined} />
-                    <AvatarFallback className="text-2xl bg-primary text-primary-foreground">{getInitials()}</AvatarFallback>
-                  </Avatar>
-                  <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
-                    <label htmlFor="avatar-upload" className="cursor-pointer w-full h-full flex items-center justify-center">
-                      <FiEdit className="h-6 w-6 text-white" />
-                      <input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
-                    </label>
-                  </div>
-                  {uploadingAvatar && (
-                    <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-4 border-white border-t-transparent"></div>
-                    </div>
-                  )}
-                </div>
-                <div className="ml-4 mb-4">
-                  <h2 className="text-2xl font-bold">{profile?.first_name} {profile?.last_name}</h2>
-                  <p className="text-lg text-muted-foreground">{(profile as any)?.headline || profile?.title || 'Add your professional title'}</p>
-                  {(profile as any)?.location && (
-                    <p className="flex items-center text-muted-foreground text-sm mt-1">
-                      <FiMapPin className="mr-1 h-3 w-3" /> {(profile as any).location}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-2 flex-wrap items-center">
-                <div className="flex items-center gap-2 mr-2">
-                  <Switch
-                    checked={isPublic}
-                    onCheckedChange={async (checked) => {
-                      setIsPublic(checked);
-                      await supabaseAny.from('profiles').update({ is_public: checked }).eq('id', user?.id);
-                      toast({ title: checked ? 'Profile is now public' : 'Profile is now private' });
-                    }}
-                  />
-                  <span className="text-xs text-muted-foreground">{isPublic ? 'Public' : 'Private'}</span>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/candidates/${user?.id}`); toast({ title: 'Profile link copied!' }); }}>
-                  <FiShare2 className="h-4 w-4 mr-1" /> Share
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleEditToggle}>
-                  {isEditing ? <FiX className="h-4 w-4 mr-1" /> : <FiEdit className="h-4 w-4 mr-1" />}
-                  {isEditing ? 'Cancel' : 'Edit Profile'}
-                </Button>
-                {!isEditing && (
-                  <label htmlFor="resume-upload">
-                    <Button variant="outline" size="sm" disabled={uploadingResume} asChild>
-                      <div><FiFileText className="h-4 w-4 mr-1" />{uploadingResume ? 'Uploading...' : 'Upload Resume'}</div>
-                    </Button>
-                    <input id="resume-upload" type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleResumeUpload} disabled={uploadingResume} />
+            <div className="-mt-10 flex flex-col items-center text-center">
+              <div className="relative group">
+                <Avatar className="h-32 w-32 border-4 border-background shadow-sm">
+                  <AvatarImage src={profile?.avatar_url || undefined} className="object-cover" />
+                  <AvatarFallback className="text-2xl bg-primary text-primary-foreground">{getInitials()}</AvatarFallback>
+                </Avatar>
+                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                  <label htmlFor="avatar-upload" className="cursor-pointer w-full h-full flex items-center justify-center">
+                    <FiEdit className="h-6 w-6 text-white" />
+                    <input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
                   </label>
+                </div>
+                {uploadingAvatar && (
+                  <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-white border-t-transparent"></div>
+                  </div>
                 )}
               </div>
+              <h2 className="mt-4 text-3xl font-bold">{profile?.first_name} {profile?.last_name}</h2>
+              <p className="text-lg text-muted-foreground">{(profile as any)?.headline || profile?.title || 'Add your professional title'}</p>
+              {(profile as any)?.location && (
+                <p className="flex items-center text-muted-foreground text-sm mt-1">
+                  <FiMapPin className="mr-1 h-3 w-3" /> {(profile as any).location}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-5 flex flex-wrap justify-center gap-2 items-center">
+              {!isEditing && (
+                <label htmlFor="resume-upload">
+                  <Button variant="outline" size="sm" disabled={uploadingResume} asChild>
+                    <div><FiFileText className="h-4 w-4 mr-1" />{uploadingResume ? 'Uploading...' : 'Upload Resume'}</div>
+                  </Button>
+                  <input id="resume-upload" type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleResumeUpload} disabled={uploadingResume} />
+                </label>
+              )}
+              <Button variant="outline" size="sm" onClick={handleEditToggle}>
+                {isEditing ? <FiX className="h-4 w-4 mr-1" /> : <FiEdit className="h-4 w-4 mr-1" />}
+                {isEditing ? 'Cancel' : 'Edit Profile'}
+              </Button>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-md border">
+                <span className="text-sm text-muted-foreground">{isPublic ? 'Public' : 'Private'}</span>
+                <Switch
+                  checked={isPublic}
+                  onCheckedChange={async (checked) => {
+                    setIsPublic(checked);
+                    await supabaseAny.from('profiles').update({ is_public: checked }).eq('id', user?.id);
+                    toast({ title: checked ? 'Profile is now public' : 'Profile is now private' });
+                  }}
+                />
+              </div>
+              <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/candidates/${user?.id}`); toast({ title: 'Profile link copied!' }); }}>
+                <FiShare2 className="h-4 w-4 mr-1" /> Share
+              </Button>
             </div>
             
             {isEditing ? (
